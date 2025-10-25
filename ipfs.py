@@ -2,88 +2,95 @@ import os
 import requests
 from typing import Any, Dict
 
-# Pinata API credentials
-PINATA_API_KEY = '68de09698d56d5fe2518'
-PINATA_SECRET_API_KEY = 'f0447bfea07bc6acad3ec708db658d44c322d71b404fe83db0e75b82e141d359'
-PINATA_JWT='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJmZDIwOTU2Zi1hNTkwLTRmNTAtYjFiNC04ZmJkNjdkNGNkZWMiLCJlbWFpbCI6IndsaXlpbmcyMUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiNjhkZTA5Njk4ZDU2ZDVmZTI1MTgiLCJzY29wZWRLZXlTZWNyZXQiOiJmMDQ0N2JmZWEwN2JjNmFjYWQzZWM3MDhkYjY1OGQ0NGMzMjJkNzFiNDA0ZmU4M2RiMGU3NWI4MmUxNDFkMzU5IiwiZXhwIjoxNzkyOTM1OTk3fQ.vHzKCFmHdGtlpF_rhJlERjU7spCOdMrjMQllnSM0nPM'
-PINATA_PIN_URL = 'https://api.pinata.cloud/pinning/pinJSONToIPFS'
-PINATA_GATEWAY_URL = 'https://gateway.pinata.cloud/ipfs/'
+# Pinata endpoints
+PINATA_PIN_URL = "https://api.pinata.cloud/pinning/pinJSONToIPFS"
+PINATA_GATEWAY_URL = "https://gateway.pinata.cloud/ipfs/"
 
-import os
+# Read credentials from environment variables (DO NOT hard-code secrets)
 
-PINATA_API_KEY = os.environ.get("68de09698d56d5fe2518")
-PINATA_SECRET_API_KEY = os.environ.get("f0447bfea07bc6acad3ec708db658d44c322d71b404fe83db0e75b82e141d359")
-PINATA_JWT = os.environ.get("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJmZDIwOTU2Zi1hNTkwLTRmNTAtYjFiNC04ZmJkNjdkNGNkZWMiLCJlbWFpbCI6IndsaXlpbmcyMUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiNjhkZTA5Njk4ZDU2ZDVmZTI1MTgiLCJzY29wZWRLZXlTZWNyZXQiOiJmMDQ0N2JmZWEwN2JjNmFjYWQzZWM3MDhkYjY1OGQ0NGMzMjJkNzFiNDA0ZmU4M2RiMGU3NWI4MmUxNDFkMzU5IiwiZXhwIjoxNzkyOTM1OTk3fQ.vHzKCFmHdGtlpF_rhJlERjU7spCOdMrjMQllnSM0nPM")
+PINATA_API_KEY = os.environ.get("68de09698d56d5fe2518")          # fallback
+PINATA_SECRET_API_KEY = os.environ.get("f0447bfea07bc6acad3ec708db658d44c322d71b404fe83db0e75b82e141d359")  # fallback
+
+
 def _auth_headers_json() -> Dict[str, str]:
     """
-    Builds the appropriate headers for Pinata authentication.
-    Supports either JWT or API key/secret authentication.
+    Build headers for Pinata authentication.
+    Uses JWT if available, otherwise falls back to API key + secret.
     """
     if PINATA_JWT:
-        return {"Authorization": f"Bearer {PINATA_JWT}", "Content-Type": "application/json"}
-
+        return {
+            "Authorization": f"Bearer {PINATA_JWT}",
+            "Content-Type": "application/json",
+        }
     if PINATA_API_KEY and PINATA_SECRET_API_KEY:
         return {
             "pinata_api_key": PINATA_API_KEY,
             "pinata_secret_api_key": PINATA_SECRET_API_KEY,
             "Content-Type": "application/json",
         }
-
     raise RuntimeError(
-        "❌ No Pinata credentials found. "
-        "Set PINATA_JWT or both PINATA_API_KEY and PINATA_SECRET_API_KEY as environment variables."
+        "No Pinata credentials found. Set PINATA_JWT (recommended) "
+        "or both PINATA_API_KEY and PINATA_SECRET_API_KEY as environment variables."
     )
 
+
 def pin_to_ipfs(data: Dict[str, Any]) -> str:
-    """Pins a JSON-serializable dict to IPFS via Pinata and returns the CID."""
+    """
+    Pin a JSON-serializable dict to IPFS via Pinata. Returns the CID string.
+    """
     assert isinstance(data, dict), "pin_to_ipfs expects a dictionary"
 
     headers = _auth_headers_json()
 
-    # Pinata recommends wrapping JSON in 'pinataContent'
+    # Pinata recommends wrapping JSON content in 'pinataContent'
     payload = {"pinataContent": data}
 
-    r = requests.post(PINATA_PIN_URL, json=payload, headers=headers, timeout=30)
+    resp = requests.post(PINATA_PIN_URL, json=payload, headers=headers, timeout=30)
 
-    if r.status_code == 200:
-        body = r.json()
+    if resp.status_code == 200:
+        body = resp.json()
         cid = body.get("IpfsHash") or body.get("cid")
         if not cid:
             raise RuntimeError(f"Pinata response missing CID: {body}")
         return cid
 
-    # Helpful diagnostics
+    # Improve error messages
     try:
-        details = r.json()
+        details = resp.json()
     except Exception:
-        details = r.text
+        details = resp.text
 
-    if r.status_code == 401:
-        raise RuntimeError("Unauthorized: bad/expired JWT or API key/secret.")
-    if r.status_code == 403:
+    if resp.status_code == 401:
+        raise RuntimeError("401 Unauthorized: bad/expired JWT or API key/secret.")
+    if resp.status_code == 403:
         raise RuntimeError(
-            "Forbidden: key/JWT missing required pinning scopes (e.g., pinJSONToIPFS)."
+            "403 Forbidden: your credential is missing pinning scope "
+            "(e.g., 'pinning:pinJSONToIPFS'). Edit the key/JWT in Pinata and try again."
         )
-    raise RuntimeError(f"Failed to pin to IPFS: {r.status_code}, {details}")
+    raise RuntimeError(f"Failed to pin to IPFS ({resp.status_code}): {details}")
 
 
 def get_from_ipfs(cid: str, content_type: str = "json"):
-    """Fetches content from the public gateway; returns dict for JSON, bytes otherwise."""
+    """
+    Retrieve content from the public gateway by CID.
+    If content_type='json' (default), returns a dict.
+    Otherwise returns raw bytes.
+    """
     assert isinstance(cid, str), "get_from_ipfs expects a CID string"
-    url = f"{PINATA_GATEWAY_URL}{cid}"
 
-    r = requests.get(url, timeout=30)
-    if r.status_code != 200:
+    url = f"{PINATA_GATEWAY_URL}{cid}"
+    resp = requests.get(url, timeout=30)
+
+    if resp.status_code != 200:
         try:
-            details = r.json()
+            details = resp.json()
         except Exception:
-            details = r.text
-        raise RuntimeError(f"Failed to retrieve from IPFS: {r.status_code}, {details}")
+            details = resp.text
+        raise RuntimeError(f"Failed to retrieve from IPFS ({resp.status_code}): {details}")
 
     if content_type.lower() == "json":
-        data = r.json()
-        assert isinstance(data, dict), "get_from_ipfs(content_type='json') should return a dict"
+        data = resp.json()
+        assert isinstance(data, dict), "get_from_ipfs('json') should return a dict"
         return data
 
-    # For non-JSON, return raw bytes
-    return r.content
+    return resp.content
