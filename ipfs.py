@@ -8,8 +8,8 @@ PINATA_GATEWAY_URL = "https://gateway.pinata.cloud/ipfs/"
 
 # Read credentials from environment variables (DO NOT hard-code secrets)
 # Correct usage: os.environ.get("VARIABLE_NAME", "default_value")
-PINATA_API_KEY = os.environ.get("PINATA_API_KEY", "68de09698d56d5fe2518")
-PINATA_SECRET_API_KEY = os.environ.get("PINATA_SECRET_API_KEY", "f0447bfea07bc6acad3ec708db658d44c322d71b404fe83db0e75b82e141d359")
+PINATA_API_KEY = os.environ.get("PINATA_API_KEY", "24a6c82d64ade562cafc")
+PINATA_SECRET_API_KEY = os.environ.get("PINATA_SECRET_API_KEY", "5a2ff54fc754cf24fbd227e59f578921628066d4ed7ad21be2c6bfefae6057c6")
 
 
 def _auth_headers_json() -> Dict[str, str]:
