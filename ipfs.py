@@ -1,5 +1,6 @@
+import os
 import requests
-import json
+from typing import Any, Dict
 
 # Pinata API credentials
 PINATA_API_KEY = '68de09698d56d5fe2518'
