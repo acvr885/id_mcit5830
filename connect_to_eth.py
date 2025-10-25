@@ -11,37 +11,51 @@ def connect_to_eth():
     assert w3.is_connected(), f"Failed to connect to provider at {url}"
     return w3
 
-
-
 def connect_with_middleware(contract_json):
-	with open(contract_json, "r") as f:
-		d = json.load(f)
-		d = d['bsc']
-		address = d['address']
-		abi = d['abi']
-  
-
-	bsc_url = "https://data-seed-prebsc-1-s1.binance.org:8545/"
-	# The first section will be the same as "connect_to_eth()" but with a BNB url
-	w3 = Web3(HTTPProvider(bsc_url))
-  assert w3.is_connected(), f"Failed to connect to BSC provider at {bsc_url}"
-  w3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
-
-  checksum_address = Web3.to_checksum_address(address)
-  contract = w3.eth.contract(address=checksum_address, abi=abi)
+    """
+    Connect to BNB testnet with POA middleware and create a contract instance.
     
+    Args:
+        contract_json (str): Path to the JSON file containing contract info
+        
+    Returns:
+        tuple: (Web3 instance, Contract object)
+    """
+    # Read contract information from JSON file
+    with open(contract_json, "r") as f:
+        d = json.load(f)
+        d = d['bsc']
+        address = d['address']
+        abi = d['abi']
 
-	# The second section requires you to inject middleware into your w3 object and
-	# create a contract object. Read more on the docs pages at https://web3py.readthedocs.io/en/stable/middleware.html
-	# and https://web3py.readthedocs.io/en/stable/web3.contract.html
-	
-
-	return w3, contract
+    # Connect to BNB testnet using public endpoint (no API key required)
+    bsc_url = "https://data-seed-prebsc-1-s1.binance.org:8545/"
+    
+    # Alternative public BNB testnet endpoints (uncomment to use):
+    # bsc_url = "https://data-seed-prebsc-2-s1.binance.org:8545/"
+    # bsc_url = "https://bsc-testnet.publicnode.com"
+    
+    # Create Web3 instance with HTTP provider
+    w3 = Web3(HTTPProvider(bsc_url))
+    
+    # Verify connection
+    assert w3.is_connected(), f"Failed to connect to BSC provider at {bsc_url}"
+    
+    # Inject POA middleware (required for BNB Chain)
+    # BNB uses Proof of Authority consensus which requires this middleware
+    w3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
+    
+    # Convert address to checksum format (best practice)
+    checksum_address = Web3.to_checksum_address(address)
+    
+    # Create contract object with address and ABI
+    contract = w3.eth.contract(address=checksum_address, abi=abi)
+    
+    return w3, contract
 
 
 if __name__ == "__main__":
-	
-      # Test Ethereum mainnet connection
+    # Test Ethereum mainnet connection
     print("=" * 50)
     print("Testing Ethereum Mainnet Connection")
     print("=" * 50)
@@ -78,4 +92,5 @@ if __name__ == "__main__":
     print()
     print("=" * 50)
     print("All connections successful! ✓")
+    print("=" * 50)
     print("=" * 50)
