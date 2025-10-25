@@ -17,11 +17,7 @@ def _auth_headers_json() -> Dict[str, str]:
     Build headers for Pinata authentication.
     Uses JWT if available, otherwise falls back to API key + secret.
     """
-    if PINATA_JWT:
-        return {
-            "Authorization": f"Bearer {PINATA_JWT}",
-            "Content-Type": "application/json",
-        }
+
     if PINATA_API_KEY and PINATA_SECRET_API_KEY:
         return {
             "pinata_api_key": PINATA_API_KEY,
@@ -29,7 +25,7 @@ def _auth_headers_json() -> Dict[str, str]:
             "Content-Type": "application/json",
         }
     raise RuntimeError(
-        "No Pinata credentials found. Set PINATA_JWT (recommended) "
+    
         "or both PINATA_API_KEY and PINATA_SECRET_API_KEY as environment variables."
     )
 
