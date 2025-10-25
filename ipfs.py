@@ -7,9 +7,9 @@ PINATA_PIN_URL = "https://api.pinata.cloud/pinning/pinJSONToIPFS"
 PINATA_GATEWAY_URL = "https://gateway.pinata.cloud/ipfs/"
 
 # Read credentials from environment variables (DO NOT hard-code secrets)
-
-PINATA_API_KEY = os.environ.get("68de09698d56d5fe2518")          # fallback
-PINATA_SECRET_API_KEY = os.environ.get("f0447bfea07bc6acad3ec708db658d44c322d71b404fe83db0e75b82e141d359")  # fallback
+# Correct usage: os.environ.get("VARIABLE_NAME", "default_value")
+PINATA_API_KEY = os.environ.get("PINATA_API_KEY", "68de09698d56d5fe2518")
+PINATA_SECRET_API_KEY = os.environ.get("PINATA_SECRET_API_KEY", "f0447bfea07bc6acad3ec708db658d44c322d71b404fe83db0e75b82e141d359")
 
 
 def _auth_headers_json() -> Dict[str, str]:
@@ -17,7 +17,6 @@ def _auth_headers_json() -> Dict[str, str]:
     Build headers for Pinata authentication.
     Uses JWT if available, otherwise falls back to API key + secret.
     """
-
     if PINATA_API_KEY and PINATA_SECRET_API_KEY:
         return {
             "pinata_api_key": PINATA_API_KEY,
@@ -25,8 +24,7 @@ def _auth_headers_json() -> Dict[str, str]:
             "Content-Type": "application/json",
         }
     raise RuntimeError(
-    
-        "or both PINATA_API_KEY and PINATA_SECRET_API_KEY as environment variables."
+        "Missing Pinata credentials. Set PINATA_API_KEY and PINATA_SECRET_API_KEY as environment variables."
     )
 
 
