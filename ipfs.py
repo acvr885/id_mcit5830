@@ -14,6 +14,25 @@ import os
 PINATA_API_KEY = os.environ.get("68de09698d56d5fe2518")
 PINATA_SECRET_API_KEY = os.environ.get("f0447bfea07bc6acad3ec708db658d44c322d71b404fe83db0e75b82e141d359")
 PINATA_JWT = os.environ.get("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJmZDIwOTU2Zi1hNTkwLTRmNTAtYjFiNC04ZmJkNjdkNGNkZWMiLCJlbWFpbCI6IndsaXlpbmcyMUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiNjhkZTA5Njk4ZDU2ZDVmZTI1MTgiLCJzY29wZWRLZXlTZWNyZXQiOiJmMDQ0N2JmZWEwN2JjNmFjYWQzZWM3MDhkYjY1OGQ0NGMzMjJkNzFiNDA0ZmU4M2RiMGU3NWI4MmUxNDFkMzU5IiwiZXhwIjoxNzkyOTM1OTk3fQ.vHzKCFmHdGtlpF_rhJlERjU7spCOdMrjMQllnSM0nPM")
+def _auth_headers_json() -> Dict[str, str]:
+    """
+    Builds the appropriate headers for Pinata authentication.
+    Supports either JWT or API key/secret authentication.
+    """
+    if PINATA_JWT:
+        return {"Authorization": f"Bearer {PINATA_JWT}", "Content-Type": "application/json"}
+
+    if PINATA_API_KEY and PINATA_SECRET_API_KEY:
+        return {
+            "pinata_api_key": PINATA_API_KEY,
+            "pinata_secret_api_key": PINATA_SECRET_API_KEY,
+            "Content-Type": "application/json",
+        }
+
+    raise RuntimeError(
+        "❌ No Pinata credentials found. "
+        "Set PINATA_JWT or both PINATA_API_KEY and PINATA_SECRET_API_KEY as environment variables."
+    )
 
 def pin_to_ipfs(data: Dict[str, Any]) -> str:
     """Pins a JSON-serializable dict to IPFS via Pinata and returns the CID."""
