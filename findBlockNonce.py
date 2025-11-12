@@ -41,9 +41,8 @@ def mine_block(k, prev_hash, transactions):
         block_hash = m.digest()
         
         # Convert hash to binary and check trailing zeros
-        # Convert bytes to integer, then to binary string
         hash_int = int.from_bytes(block_hash, byteorder='big')
-        hash_bin = bin(hash_int)[2:]  # Remove '0b' prefix
+        hash_bin = bin(hash_int)[2:]
         
         # Count trailing zeros
         trailing_zeros = 0
@@ -92,23 +91,13 @@ if __name__ == '__main__':
 
     prev_hash = hashlib.sha256(b"previous_block").digest()
     
-    transactions = get_random_lines(filename, num_lines)
-    nonce = mine_block(diff, prev_hash, transactions)
-    print(f"Found nonce: {nonce}")
+    # Get random lines
+    rand_lines = get_random_lines(filename, num_lines)
     
-    # Verify the result
-    m = hashlib.sha256()
-    m.update(prev_hash)
-    for line in transactions:
-        m.update(line.encode('utf-8'))
-    m.update(nonce)
-    result_hash = m.digest()
-    hash_int = int.from_bytes(result_hash, byteorder='big')
-    hash_bin = bin(hash_int)[2:]
-    trailing = 0
-    for i in range(len(hash_bin) - 1, -1, -1):
-        if hash_bin[i] == '0':
-            trailing += 1
-        else:
-            break
-    print(f"Trailing zeros: {trailing}")
+    # Call mine_block with all 3 parameters
+    nonce = mine_block(diff, prev_hash, rand_lines)
+    print(f"Found nonce: {nonce}")
+
+    #transactions = get_random_lines(filename, num_lines)
+    #nonce = mine_block(diff, transactions)
+    #print(nonce)
