@@ -90,6 +90,25 @@ if __name__ == '__main__':
     # The grader will not exceed 20 bits of "difficulty" because larger values take to long
     diff = 20
 
+    prev_hash = hashlib.sha256(b"previous_block").digest()
+    
     transactions = get_random_lines(filename, num_lines)
-    nonce = mine_block(diff, transactions)
-    print(nonce)
+    nonce = mine_block(diff, prev_hash, transactions)
+    print(f"Found nonce: {nonce}")
+    
+    # Verify the result
+    m = hashlib.sha256()
+    m.update(prev_hash)
+    for line in transactions:
+        m.update(line.encode('utf-8'))
+    m.update(nonce)
+    result_hash = m.digest()
+    hash_int = int.from_bytes(result_hash, byteorder='big')
+    hash_bin = bin(hash_int)[2:]
+    trailing = 0
+    for i in range(len(hash_bin) - 1, -1, -1):
+        if hash_bin[i] == '0':
+            trailing += 1
+        else:
+            break
+    print(f"Trailing zeros: {trailing}")
