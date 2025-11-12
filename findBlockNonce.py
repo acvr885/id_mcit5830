@@ -87,7 +87,7 @@ if __name__ == '__main__':
     # The "difficulty" level. For our blocks this is the number of Least Significant Bits
     # that are 0s. For example, if diff = 5 then the last 5 bits of a valid block hash would be zeros
     # The grader will not exceed 20 bits of "difficulty" because larger values take to long
-    diff = 20
+    diff = 5
 
     prev_hash = hashlib.sha256(b"previous_block").digest()
     
