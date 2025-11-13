@@ -180,7 +180,8 @@ def send_signed_msg(proof, random_leaf):
     acct = get_account()
     address, abi = get_contract_info(chain)
     w3 = connect_to(chain)
-    #tx_hash = 'placeholder'
+
+    # Create contract instance
     contract = w3.eth.contract(address=address, abi=abi)
     
     # Get transaction parameters
@@ -199,8 +200,8 @@ def send_signed_msg(proof, random_leaf):
     # Sign the transaction
     signed_txn = w3.eth.account.sign_transaction(txn, acct.key)
     
-    # Send the transaction
-    tx_hash = w3.eth.send_raw_transaction(signed_txn.raw_Transaction)
+    # Send the transaction - MUST be raw_transaction (all lowercase with underscore)
+    tx_hash = w3.eth.send_raw_transaction(signed_txn.raw_transaction)
     
     # Wait for transaction receipt
     receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
