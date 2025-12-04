@@ -8,8 +8,8 @@ BSC_RPC  = "https://data-seed-prebsc-1-s1.binance.org:8545/"
 contract_info = "contract_info.json"
 
 # Warden credentials (deployer of both bridge contracts)
-private_key = "<YOUR_WARDEN_PRIVATE_KEY>".removeprefix("0x")
-account_address = Web3.to_checksum_address("<YOUR_WARDEN_ADDRESS>")
+private_key = "0x10aff6e7abe9a5b51bd776987d296b0b95db8ee82b3ec9e71ced86a89bea1045"
+account_address = '0x12349840E00aD66A7E2038777d58601b9dF11D8d'
 
 
 def connect_to(chain):
