@@ -9,8 +9,8 @@ import pandas as pd
 source_chain = 'avax'
 destination_chain = 'bsc'
 contract_info = "contract_info.json"
-private_key = "5a2ff54fc754cf24fbd227e59f578921628066d4ed7ad21be2c6bfefae6057c6"
-account_address = '0x10aff6e7abe9a5b51bd776987d296b0b95db8ee82b3ec9e71ced86a89bea1045'
+private_key = "0x10aff6e7abe9a5b51bd776987d296b0b95db8ee82b3ec9e71ced86a89bea1045"
+account_address = '0x12349840E00aD66A7E2038777d58601b9dF11D8d'
 
 
 
